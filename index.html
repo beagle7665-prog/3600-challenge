@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3600 分鐘挑戰</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* 基礎樣式與可愛字體 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Mochiy+Pop+One&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FFF9E6;
+            color: #5D4037;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Mochiy Pop One', sans-serif;
+            color: #FF7043;
+            margin-top: 0;
+            font-size: 2em;
+            line-height: 1.4;
+        }
+
+        /* 1. 巨大進度條 */
+        .progress-area { margin-bottom: 30px; }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .progress-text .current { color: #FF7043; }
+        .progress-bar-background {
+            width: 100%;
+            height: 40px;
+            background-color: #FFCCBC;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid #FFF;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FFEE58, #FFC107);
+            border-radius: 20px;
+            transition: width 0.5s ease-out;
+        }
+
+        /* 2. 輸入區 */
+        .input-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .input-area label { font-size: 1.1em; font-weight: 700; }
+        .input-area select {
+            font-size: 1.1em;
+            padding: 10px;
+            border: 2px solid #FFAB91;
+            border-radius: 10px;
+            background-color: white;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .input-area input[type="number"] {
+            font-size: 1.2em;
+            width: 100px;
+            padding: 10px;
+            border: 2px solid #FFAB91;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .input-area input[type=number]::-webkit-inner-spin-button, 
+        .input-area input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .input-area input[type=number] { -moz-appearance: textfield; }
+        .input-area button {
+            font-family: 'Mochiy Pop One', sans-serif;
+            font-size: 1.1em;
+            padding: 12px 25px;
+            background-color: #69F0AE;
+            color: #004D40;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .input-area button:hover {
+            background-color: #00E676;
+            transform: scale(1.05);
+        }
+
+        /* 4. 歷史紀錄表 */
+        .history-log { text-align: left; }
+        .history-log h2 {
+            display: flex; /* (新) 讓標題和按鈕並排 */
+            justify-content: center;
+            align-items: center;
+            gap: 15px; /* (新) 標題和按鈕的間距 */
+            color: #FFA726;
+        }
+        
+        /* (新) 分享按鈕樣式 */
+        .share-btn {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 700;
+            font-size: 0.8em;
+            padding: 8px 15px;
+            background-color: #81D4FA; /* 活潑的藍色 */
+            color: #01579B;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .share-btn:hover {
+            background-color: #40C4FF;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td { padding: 12px; border-bottom: 1px solid #FFEDD5; }
+        th { background-color: #FFF3E0; color: #E65100; }
+        th:nth-child(1), td:nth-child(1) { width: 30%; } /* 日期 */
+        th:nth-child(2), td:nth-child(2) { width: 25%; } /* 人員 */
+        th:nth-child(3), td:nth-child(3) { width: 25%; } /* 分鐘數 */
+        th:nth-child(4), td:nth-child(4) { width: 20%; text-align: center; } /* 操作 */
+        .delete-btn {
+            background-color: #FFCDD2;
+            color: #B71C1C;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .delete-btn:hover { background-color: #EF9A9A; }
+
+        /* 3. 彈出視窗 (Modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 20px;
+            text-align: center;
+            animation: modal-pop 0.3s ease-out;
+            max-width: 90%;
+            width: 450px; /* (新) 固定寬度 */
+        }
+        .modal-content h3 {
+            font-family: 'Mochiy Pop One', sans-serif;
+            font-size: 2em;
+            color: #FF5252;
+            margin: 0 0 15px 0;
+        }
+        .modal-content p { font-size: 1.2em; margin-bottom: 25px; }
+        .modal-content button {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 700;
+            font-size: 1em;
+            padding: 10px 30px;
+            background-color: #FF7043;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* (新) 分享 Modal 的專屬樣式 */
+        #qrcode-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 2px dashed #FFAB91;
+            padding: 10px;
+            border-radius: 10px;
+            min-height: 220px; /* 預留 QR Code 空間 */
+        }
+        #qrcode {
+            /* QR Code 會被 JS 塞到這裡 */
+        }
+        #share-url-input {
+            width: 100%;
+            box-sizing: border-box; /* 確保 padding 不會讓它超出寬度 */
+            padding: 8px;
+            font-size: 0.9em;
+            border: 1px solid #FFAB91;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #copy-link-button {
+            background-color: #29B6F6; /* 藍色 */
+            margin-right: 10px;
+        }
+        #share-modal-close-button {
+            background-color: #BDBDBD; /* 灰色 */
+        }
+
+        @keyframes modal-pop {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>廣明地區四部同心<br>3600分鐘挑戰</h1>
+
+        <div class="progress-area">
+            <div class="progress-text">
+                <span class="current" id="current-minutes-text">0 / 3600 分鐘</span>
+                <span class="percentage" id="percentage-text">0%</span>
+            </div>
+            <div class="progress-bar-background">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <label for="person-select">人員：</label>
+            <select id="person-select">
+                <option value="地區級幹部">地區級幹部</option>
+                <option value="三和組長">三和組長</option>
+                <option value="介壽組長">介壽組長</option>
+                <option value="柏林組長">柏林組長</option>
+                <option value="南豐組長">南豐組長</option>
+                <option value="壯年部">壯年部</option>
+                <option value="青年部">青年部</option>
+            </select>
+            
+            <label for="minutes-input">分鐘數：</label>
+            <input type="number" id="minutes-input" min="1" placeholder="例如: 30">
+            <button id="submit-button">累積！</button>
+        </div>
+
+        <div class="history-log">
+            <h2>
+                累積紀錄
+                <button id="share-button" class="share-btn">分享進度</button>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>人員</th>
+                        <th>輸入分鐘數</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">太棒了！</h3>
+            <p id="modal-message">你又完成了一個里程碑！</p>
+            <button id="modal-close-button">繼續加油！</Tton>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="share-modal-overlay">
+        <div class="modal-content">
+            <h3>分享挑戰進度</h3>
+            <p>掃描 QR Code 或複製連結分享</p>
+            
+            <div id="qrcode-container">
+                <div id="qrcode"></div> </div>
+            
+            <input type="text" id="share-url-input" readonly>
+            
+            <button id="copy-link-button">複製連結</button>
+            <button id="share-modal-close-button">關閉</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 變數定義 ---
+        const GOAL_MINUTES = 3600;
+        let currentMinutes = 0;
+        let history = []; // 存放 {id: ..., date: '...', person: '...', minutes: 0}
+
+        // 鼓勵小語資料庫
+        const encouragementMessages = [
+            "太神啦！你又完成了 100 分鐘！", "堅持是超能力的開始！", "哇！離目標又更近一步了！",
+            "做得好！繼續保持這個節奏！", "你超棒的！休息一下，等等繼續！"
+        ];
+
+        // --- DOM 元素綁定 ---
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const currentMinutesText = document.getElementById('current-minutes-text');
+        const percentageText = document.getElementById('percentage-text');
+        const minutesInput = document.getElementById('minutes-input');
+        const personSelect = document.getElementById('person-select');
+        const submitButton = document.getElementById('submit-button');
+        const historyTableBody = document.getElementById('history-table-body');
+        
+        // 恭喜 Modal
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseButton = document.getElementById('modal-close-button');
+        
+        // (新) 分享 Modal
+        const shareButton = document.getElementById('share-button');
+        const shareModalOverlay = document.getElementById('share-modal-overlay');
+        const shareModalCloseButton = document.getElementById('share-modal-close-button');
+        const qrcodeElement = document.getElementById('qrcode');
+        const shareUrlInput = document.getElementById('share-url-input');
+        const copyLinkButton = document.getElementById('copy-link-button');
+        let qrCodeInstance = null; // 存放 QR Code 物件
+
+        // --- (新) Base64 編碼/解碼輔助函式 (處理中文) ---
+        // (來源: MDN)
+        function utf8_to_b64(str) {
+            try {
+                // 1. 將 string 轉為 UTF-8
+                // 2. unescape: 將 %xx 轉為 byte
+                // 3. btoa: 將 byte string 轉為 base64
+                return btoa(unescape(encodeURIComponent(str)));
+            } catch (e) {
+                console.error("Base64 encoding failed", e);
+                return "";
+            }
+        }
+        
+        function b64_to_utf8(str) {
+            try {
+                // 1. atob: 將 base64 轉為 byte string
+                // 2. escape: 將 byte 轉為 %xx 格式
+                // 3. decodeURIComponent: 將 UTF-8 的 %xx 轉回 string
+                return decodeURIComponent(escape(atob(str)));
+            } catch (e) {
+                console.error("Base64 decoding failed", e);
+                return "";
+            }
+        }
+
+        // --- 核心功能 ---
+
+        // 1. (修改) 頁面載入
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        // 2. 按下「累積！」按鈕的事件
+        submitButton.addEventListener('click', () => {
+            const inputVal = parseInt(minutesInput.value, 10);
+            const personVal = personSelect.value; 
+
+            if (isNaN(inputVal) || inputVal <= 0) {
+                alert("請輸入有效的分鐘數！");
+                return;
+            }
+
+            const oldMilestone = Math.floor(currentMinutes / 100);
+            
+            currentMinutes += inputVal;
+            if (currentMinutes > GOAL_MINUTES) {
+                currentMinutes = GOAL_MINUTES;
+            }
+            const newMilestone = Math.floor(currentMinutes / 100);
+
+            const now = new Date();
+            const dateString = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+            history.unshift({ 
+                id: Date.now(), 
+                date: dateString, 
+                person: personVal, 
+                minutes: inputVal 
+            });
+
+            updateUI();
+            renderHistoryTable();
+            saveData();
+            minutesInput.value = "";
+
+            if (newMilestone > oldMilestone) {
+                triggerCelebration(newMilestone);
+            }
+            if (currentMinutes === GOAL_MINUTES) {
+                triggerFinalGoal();
+            }
+        });
+
+        // 3. 更新所有 UI 元素 (進度條)
+        function updateUI() {
+            if (currentMinutes < 0) currentMinutes = 0;
+            let percentage = (currentMinutes / GOAL_MINUTES) * 100;
+            percentage = Math.max(0, Math.min(percentage, 100));
+            progressBarFill.style.width = percentage + '%';
+            currentMinutesText.textContent = `${currentMinutes} / ${GOAL_MINUTES} 分鐘`;
+            percentageText.textContent = `${percentage.toFixed(1)}%`;
+        }
+
+        // 4. 渲染歷史紀錄表格
+        function renderHistoryTable() {
+            historyTableBody.innerHTML = "";
+            history.forEach(entry => {
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-id', entry.id);
+                newRow.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.person || 'N/A'}</td>
+                    <td>${entry.minutes} 分鐘</td>
+                    <td>
+                        <button class="delete-btn">刪除</button>
+                    </td>
+                `;
+                newRow.querySelector('.delete-btn').addEventListener('click', () => {
+                    deleteHistoryEntry(entry.id, entry.minutes);
+                });
+                historyTableBody.append(newRow);
+            });
+        }
+        
+        // 5. 刪除一筆歷史紀錄
+        function deleteHistoryEntry(id, minutesToDelete) {
+            if (!confirm(`確定要刪除這筆 ${minutesToDelete} 分鐘的紀錄嗎？\n總時數將會被扣除。`)) {
+                return;
+            }
+            currentMinutes -= minutesToDelete;
+            history = history.filter(entry => entry.id !== id);
+            updateUI();
+            renderHistoryTable();
+            saveData();
+        }
+
+        // 6. 觸發 100 分鐘里程碑動畫
+        function triggerCelebration(milestone) {
+            const message = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
+            modalMessage.textContent = message;
+            modalOverlay.style.display = 'flex';
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+        }
+        
+        // 7. 觸發 3600 分鐘總目標
+        function triggerFinalGoal() {
+            modalMessage.textContent = `恭喜你！完成了 ${GOAL_MINUTES} 分鐘的超級挑戰！你太強了！`;
+            modalOverlay.style.display = 'flex';
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // 8. 關閉恭喜彈出視窗
+        modalCloseButton.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+        });
+
+        // --- (新) 分享功能 ---
+        
+        // 9. (新) 綁定「分享」按鈕
+        shareButton.addEventListener('click', () => {
+            // 1. 產生 data
+            const data = {
+                minutes: currentMinutes,
+                history: history
+            };
+            // 2. 將 data 轉為 JSON 字串，再轉為 Base64
+            const encodedData = utf8_to_b64(JSON.stringify(data));
+            
+            // 3. 產生 URL
+            // (重要!) window.location.origin + window.location.pathname 是為了去除舊的 hash
+            const shareUrl = window.location.origin + window.location.pathname + '#' + encodedData;
+
+            // 4. 顯示 URL
+            shareUrlInput.value = shareUrl;
+
+            // 5. 產生 QR Code
+            qrcodeElement.innerHTML = ""; // 清除舊的 QR Code
+            try {
+                 new QRCode(qrcodeElement, {
+                    text: shareUrl,
+                    width: 200,
+                    height: 200,
+                    correctLevel : QRCode.CorrectLevel.M // M 等級，容錯率
+                });
+            } catch (e) {
+                qrcodeElement.innerHTML = "QR Code 產生失敗。資料可能過多。";
+            }
+           
+            // 6. 顯示 Modal
+            shareModalOverlay.style.display = 'flex';
+            
+            // 7. 警告使用者 (如果是在 local file 執行)
+            if (window.location.protocol === 'file:') {
+                alert("警告：您目前是透過 'file://' 協定開啟此頁面。\n\n產生的「分享連結」和「QR Code」將無法在其他裝置上使用。\n\n請將此 'tracker.html' 檔案上傳到一個網站伺服器 (例如 GitHub Pages) 才能正常使用分享功能。");
+            }
+        });
+
+        // 10. (新) 綁定「關閉分享」按鈕
+        shareModalCloseButton.addEventListener('click', () => {
+            shareModalOverlay.style.display = 'none';
+        });
+
+        // 11. (新) 綁定「複製連結」按鈕
+        copyLinkButton.addEventListener('click', () => {
+            shareUrlInput.select();
+            try {
+                // document.execCommand('copy') 是舊版 API，但在這種簡單情境下最可靠
+                document.execCommand('copy');
+                copyLinkButton.textContent = '已複製！';
+                setTimeout(() => {
+                    copyLinkButton.textContent = '複製連結';
+                }, 2000);
+            } catch (err) {
+                alert('複製失敗，請手動複製。');
+            }
+        });
+
+        // --- 資料儲存 (localStorage) ---
+
+        // 12. 儲存資料
+        function saveData() {
+            localStorage.setItem('timeTracker_currentMinutes', currentMinutes);
+            localStorage.setItem('timeTracker_history', JSON.stringify(history));
+        }
+
+        // 13. (修改) 讀取資料
+        function loadData() {
+            // 優先：檢查 URL hash 是否有資料
+            if (window.location.hash && window.location.hash.length > 1) {
+                console.log("偵測到 URL hash，嘗試讀取分享資料...");
+                const encodedData = window.location.hash.substring(1);
+                const jsonString = b64_to_utf8(encodedData);
+                
+                if (jsonString) {
+                    try {
+                        const data = JSON.parse(jsonString);
+                        currentMinutes = data.minutes || 0;
+                        history = data.history || [];
+                        
+                        // (重要) 將 URL 中的資料存回 localStorage
+                        saveData();
+                        
+                        // (重要) 清除 URL hash，避免使用者刷新時再次讀取
+                        history.replaceState(null, document.title, window.location.pathname + window.location.search);
+
+                    } catch (e) {
+                        console.error("Failed to parse data from URL", e);
+                        loadFromLocalStorage(); // URL 格式錯誤，改為讀取 local
+                    }
+                } else {
+                    loadFromLocalStorage(); // Base64 解碼失敗
+                }
+            } else {
+                // 其次：從 localStorage 讀取
+                loadFromLocalStorage();
+            }
+            
+            // 載入資料後，一次性更新畫面
+            updateUI();
+            renderHistoryTable();
+        }
+        
+        // 14. (新) 獨立的 localStorage 讀取函式
+        function loadFromLocalStorage() {
+            console.log("從 localStorage 讀取資料...");
+            const savedMinutes = localStorage.getItem('timeTracker_currentMinutes');
+            const savedHistory = localStorage.getItem('timeTracker_history');
+
+            if (savedMinutes) {
+                currentMinutes = parseInt(savedMinutes, 10);
+            }
+
+            if (savedHistory) {
+                history = JSON.parse(savedHistory);
+                // 確保舊資料有 ID (向下相容)
+                history = history.map(entry => {
+                    if (!entry.id) {
+                        return { ...entry, id: Date.now() + Math.random() }; 
+                    }
+                    return entry;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
