@@ -12,8 +12,7 @@
         /* (部分樣式省略，只顯示新增/修改的部分) */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Mochiy+Pop+One&display=swap');
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #FFF9E6; color: #5D4037;
+            font-family: 'Noto Sans TC', sans-serif; background-color: #FFF9E6; color: #5D4037;
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 20px; box-sizing: border-box;
         }
@@ -74,10 +73,9 @@
         .history-log { text-align: left; }
         .history-log h2 {
             display: flex; justify-content: center; align-items: center;
-            gap: 15px; color: #FFA726; flex-wrap: wrap; /* (新) 允許換行 */
+            gap: 15px; color: #FFA726; flex-wrap: wrap;
         }
         
-        /* (新) 管理員按鈕樣式 */
         .admin-btn, .share-btn {
             font-family: 'Noto Sans TC', sans-serif; font-weight: 700;
             font-size: 0.8em; padding: 8px 15px; border: none;
@@ -86,19 +84,13 @@
         }
         .share-btn { background-color: #81D4FA; color: #01579B; }
         .share-btn:hover { background-color: #40C4FF; }
-        .admin-btn { background-color: #B39DDB; color: #311B92; } /* 紫色 */
+        .admin-btn { background-color: #B39DDB; color: #311B92; }
         .admin-btn:hover { background-color: #9575CD; }
         
-        /* (新) 管理員狀態文字 */
         .admin-status {
-            font-size: 0.8em;
-            color: #D32F2F; /* 紅色 */
-            font-weight: 700;
+            font-size: 0.8em; color: #D32F2F; font-weight: 700;
         }
-        /* (新) 登入後隱藏登入按鈕 */
-        body.admin-mode .admin-btn {
-            display: none;
-        }
+        body.admin-mode .admin-btn { display: none; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid #FFEDD5; }
@@ -116,19 +108,14 @@
         .delete-btn { background-color: #FFCDD2; color: #B71C1C; }
         .delete-btn:hover { background-color: #EF9A9A; }
         
-        /* (新) 復原按鈕樣式 */
         .restore-btn { background-color: #A5D6A7; color: #1B5E20; }
         .restore-btn:hover { background-color: #81C784; }
         
-        /* (新) 已刪除的資料列樣式 (只在 Admin 模式下顯示) */
         tr.deleted-row {
-            background-color: #FAFAFA;
-            color: #BDBDBD;
+            background-color: #FAFAFA; color: #BDBDBD;
             text-decoration: line-through;
         }
-        tr.deleted-row td {
-            color: #BDBDBD !important;
-        }
+        tr.deleted-row td { color: #BDBDBD !important; }
         
         /* 彈出視窗 (Modal) */
         .modal-overlay {
@@ -151,6 +138,8 @@
             font-size: 1em; padding: 10px 30px; background-color: #FF7043;
             color: white; border: none; border-radius: 10px; cursor: pointer;
         }
+        
+        /* 分享 Modal */
         #qrcode-container {
             display: flex; justify-content: center; align-items: center;
             margin-bottom: 20px; border: 2px dashed #FFAB91;
@@ -163,6 +152,38 @@
         }
         #copy-link-button { background-color: #29B6F6; margin-right: 10px; }
         #share-modal-close-button { background-color: #BDBDBD; }
+
+        /* (新) 管理員登入 Modal 樣式 */
+        #admin-modal-content h3 {
+             color: #7E57C2; /* 深紫色 */
+        }
+        .admin-form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .admin-form-group label {
+            width: 80px; /* 標籤固定寬度 */
+            text-align: right;
+            margin-right: 15px;
+            font-weight: 700;
+        }
+        .admin-form-group select, .admin-form-group input {
+            flex: 1; /* 佔滿剩餘空間 */
+            font-size: 1.1em;
+            padding: 10px;
+            border: 2px solid #D1C4E9; /* 淺紫色 */
+            border-radius: 10px;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        #admin-login-submit-btn {
+            background-color: #7E57C2; /* 深紫色 */
+            margin-right: 10px;
+        }
+        #admin-modal-close-btn {
+            background-color: #BDBDBD; /* 灰色 */
+        }
 
         @keyframes modal-pop {
             from { transform: scale(0.7); opacity: 0; }
@@ -189,7 +210,7 @@
             <label for="person-select">人員：</label>
             <select id="person-select">
                 <option value="地區級幹部">地區級幹部</option>
-                <option value="三和組長">三和組長</option>
+                <option value="地企管理員">地企管理員</option> <option value="三和組長">三和組長</option>
                 <option value="介壽組長">介壽組長</option>
                 <option value="柏林組長">柏林組長</option>
                 <option value="南豐組長">南豐組長</option>
@@ -205,8 +226,10 @@
         <div class="history-log">
             <h2>
                 累積紀錄
-                <span id="admin-status" class="admin-status"></span> <button id="share-button" class="share-btn">分享進度</button>
-                <button id="admin-login-btn" class="admin-btn">管理員</button> </h2>
+                <span id="admin-status" class="admin-status"></span>
+                <button id="share-button" class="share-btn">分享進度</button>
+                <button id="admin-login-btn" class="admin-btn">管理員</button>
+            </h2>
             <table>
                 <thead>
                     <tr>
@@ -240,14 +263,34 @@
             <button id="share-modal-close-button">關閉</button>
         </div>
     </div>
+    
+    <div class="modal-overlay" id="admin-modal-overlay">
+        <div class="modal-content" id="admin-modal-content">
+            <h3>管理員登入</h3>
+            
+            <div class="admin-form-group">
+                <label for="admin-level-select">層級：</label>
+                <select id="admin-level-select">
+                    <option value="地企管理員">地企管理員</option> </select>
+            </div>
+            
+            <div class="admin-form-group">
+                <label for="admin-password-input">密碼：</label>
+                <input type="password" id="admin-password-input" placeholder="請輸入密碼">
+            </div>
+            
+            <button id="admin-login-submit-btn">登入</button>
+            <button id="admin-modal-close-btn">取消</button>
+        </div>
+    </div>
 
     <script>
-        // --- (新) 變數定義 ---
+        // --- 變數定義 ---
         const GOAL_MINUTES = 3600;
-        const ADMIN_PASSWORD = "gm3600"; // (新) 管理員密碼，請自行修改
-        let currentMinutes = 0; // (修改) 變為由 history 動態計算
-        let history = []; // 存放 {id: ..., date: '...', person: '...', minutes: 0, status: 'active'}
-        let isAdmin = false; // (新) 管理員模式狀態
+        const ADMIN_PASSCODE = "1213"; // [!!] 已修改
+        let currentMinutes = 0;
+        let history = []; 
+        let isAdmin = false; 
 
         // 鼓勵小語資料庫
         const encouragementMessages = [
@@ -255,31 +298,43 @@
             "做得好！繼續保持這個節奏！", "你超棒的！休息一下，等等繼續！"
         ];
 
-        // --- DOM 元素綁定 ---
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const currentMinutesText = document.getElementById('current-minutes-text');
-        const percentageText = document.getElementById('percentage-text');
-        const minutesInput = document.getElementById('minutes-input');
-        const personSelect = document.getElementById('person-select');
-        const submitButton = document.getElementById('submit-button');
-        const historyTableBody = document.getElementById('history-table-body');
-        
-        // Modals
-        const modalOverlay = document.getElementById('modal-overlay');
-        const modalMessage = document.getElementById('modal-message');
-        const modalCloseButton = document.getElementById('modal-close-button');
-        
-        // Share Modal
-        const shareButton = document.getElementById('share-button');
-        const shareModalOverlay = document.getElementById('share-modal-overlay');
-        const shareModalCloseButton = document.getElementById('share-modal-close-button');
-        const qrcodeElement = document.getElementById('qrcode');
-        const shareUrlInput = document.getElementById('share-url-input');
-        const copyLinkButton = document.getElementById('copy-link-button');
+        // --- 程式碼結構優化：頁面載入後才執行 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. 綁定所有靜態按鈕的事件
+            bindStaticEventListeners();
+            // 2. 載入資料 (這會觸發第一次的 UI 更新和表格渲染)
+            loadData();
+        });
 
-        // (新) Admin Modal
-        const adminLoginButton = document.getElementById('admin-login-btn');
-        const adminStatusText = document.getElementById('admin-status');
+        // 1. 綁定所有不會被重繪的「靜態」按鈕
+        function bindStaticEventListeners() {
+            // 累積按鈕
+            document.getElementById('submit-button').addEventListener('click', handleSubmit);
+            
+            // 恭喜 Modal 關閉按鈕
+            document.getElementById('modal-close-button').addEventListener('click', () => {
+                document.getElementById('modal-overlay').style.display = 'none';
+            });
+            
+            // 分享按鈕
+            document.getElementById('share-button').addEventListener('click', handleShareClick);
+            
+            // 分享 Modal 內的按鈕
+            document.getElementById('copy-link-button').addEventListener('click', handleCopyLink);
+            document.getElementById('share-modal-close-button').addEventListener('click', () => {
+                document.getElementById('share-modal-overlay').style.display = 'none';
+            });
+            
+            // 管理員登入按鈕 (顯示 Modal)
+            document.getElementById('admin-login-btn').addEventListener('click', handleAdminLoginClick);
+            
+            // 管理員 Modal 內的按鈕
+            document.getElementById('admin-login-submit-btn').addEventListener('click', handleAdminLoginSubmit);
+            document.getElementById('admin-modal-close-btn').addEventListener('click', () => {
+                document.getElementById('admin-modal-overlay').style.display = 'none';
+                document.getElementById('admin-password-input').value = ''; // 關閉時清空密碼
+            });
+        }
 
         // --- Base64 編碼/解碼輔助函式 (處理中文) ---
         function utf8_to_b64(str) {
@@ -291,15 +346,13 @@
             catch (e) { console.error("Base64 decoding failed", e); return ""; }
         }
 
-        // --- 核心功能 ---
+        // --- 核心功能 (被 bindStaticEventListeners 呼叫) ---
 
-        // 1. 頁面載入
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-        });
-
-        // 2. 按下「累積！」按鈕的事件 (修改)
-        submitButton.addEventListener('click', () => {
+        // 2. 按下「累積！」按鈕的事件
+        function handleSubmit() {
+            const minutesInput = document.getElementById('minutes-input');
+            const personSelect = document.getElementById('person-select');
+            
             const inputVal = parseInt(minutesInput.value, 10);
             const personVal = personSelect.value; 
 
@@ -308,10 +361,9 @@
                 return;
             }
 
-            const oldTotal = currentMinutes; // (新) 儲存舊的總數
+            const oldTotal = currentMinutes;
             const oldMilestone = Math.floor(oldTotal / 100);
             
-            // (新) 新增紀錄，並標記為 'active'
             const now = new Date();
             const dateString = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
             history.unshift({ 
@@ -319,16 +371,14 @@
                 date: dateString, 
                 person: personVal, 
                 minutes: inputVal,
-                status: 'active' // (新) 狀態
+                status: 'active'
             });
 
-            // (新) 重新計算總數並更新 UI
             recalculateTotalAndRender(); 
             
             saveData();
-            minutesInput.value = "";
+            minutesInput.value = ""; // 清空輸入框
 
-            // (新) 使用更新後的 currentMinutes 檢查里程碑
             const newMilestone = Math.floor(currentMinutes / 100);
             if (newMilestone > oldMilestone) {
                 triggerCelebration(newMilestone);
@@ -336,11 +386,10 @@
             if (currentMinutes === GOAL_MINUTES && oldTotal < GOAL_MINUTES) {
                 triggerFinalGoal();
             }
-        });
+        }
 
-        // 3. (新) 核心：重新計算總分鐘數並更新 UI
+        // 3. 核心：重新計算總分鐘數並更新 UI
         function recalculateTotalAndRender() {
-            // (新) 只加總 status 為 'active' 的項目
             currentMinutes = history
                 .filter(entry => entry.status === 'active')
                 .reduce((sum, entry) => sum + entry.minutes, 0);
@@ -349,14 +398,16 @@
                 currentMinutes = GOAL_MINUTES;
             }
             
-            // 更新進度條 UI
             updateProgressBarUI();
-            // 重新渲染表格 (因為 Admin 狀態可能不同)
             renderHistoryTable();
         }
 
-        // 4. (新) 僅更新進度條 (被 recalculateTotalAndRender 呼叫)
+        // 4. 僅更新進度條
         function updateProgressBarUI() {
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const currentMinutesText = document.getElementById('current-minutes-text');
+            const percentageText = document.getElementById('percentage-text');
+
             if (currentMinutes < 0) currentMinutes = 0;
             let percentage = (currentMinutes / GOAL_MINUTES) * 100;
             percentage = Math.max(0, Math.min(percentage, 100));
@@ -365,14 +416,14 @@
             percentageText.textContent = `${percentage.toFixed(1)}%`;
         }
 
-        // 5. (修改) 渲染歷史紀錄表格
+        // 5. 渲染歷史紀錄表格 (包含動態綁定「刪除/復原」按鈕)
         function renderHistoryTable() {
+            const historyTableBody = document.getElementById('history-table-body');
             historyTableBody.innerHTML = "";
             
             history.forEach(entry => {
-                // (新) Admin 模式下才顯示 "deleted"
                 if (entry.status === 'deleted' && !isAdmin) {
-                    return; // 不是 Admin，跳過此筆
+                    return; 
                 }
 
                 const newRow = document.createElement('tr');
@@ -380,7 +431,6 @@
                 
                 let actionButtonHtml = '';
 
-                // (新) 根據 Admin 狀態和紀錄狀態決定按鈕
                 if (isAdmin) {
                     if (entry.status === 'active') {
                         actionButtonHtml = `<button class="delete-btn">刪除</button>`;
@@ -388,11 +438,9 @@
                         actionButtonHtml = `<button class="restore-btn">復原</button>`;
                     }
                 } else {
-                    // 一般使用者只能刪除
                     actionButtonHtml = `<button class="delete-btn">刪除</button>`;
                 }
                 
-                // (新) 如果是已刪除，加上 CSS class
                 if (entry.status === 'deleted') {
                     newRow.classList.add('deleted-row');
                 }
@@ -404,7 +452,7 @@
                     <td>${actionButtonHtml}</td>
                 `;
                 
-                // (新) 綁定按鈕事件
+                // 動態綁定
                 if (isAdmin) {
                     if (entry.status === 'active') {
                         newRow.querySelector('.delete-btn').addEventListener('click', () => {
@@ -425,7 +473,7 @@
             });
         }
         
-        // 6. (修改) 軟刪除一筆歷史紀錄
+        // 6. 軟刪除一筆歷史紀錄
         function softDeleteHistoryEntry(id) {
             const entry = history.find(e => e.id === id);
             if (!entry) return;
@@ -434,16 +482,14 @@
                 return;
             }
 
-            entry.status = 'deleted'; // (新) 只改變狀態
-            
-            recalculateTotalAndRender(); // (新) 重新計算
+            entry.status = 'deleted';
+            recalculateTotalAndRender();
             saveData();
         }
 
-        // 7. (新) 復原一筆歷史紀錄 (僅限 Admin)
+        // 7. 復原一筆歷史紀錄
         function restoreHistoryEntry(id) {
-            if (!isAdmin) return; // 安全檢查
-
+            if (!isAdmin) return; 
             const entry = history.find(e => e.id === id);
             if (!entry) return;
 
@@ -451,11 +497,158 @@
                 return;
             }
 
-            entry.status = 'active'; // (新) 狀態改回 active
-            
-            recalculateTotalAndRender(); // (新) 重新計算
+            entry.status = 'active';
+            recalculateTotalAndRender();
             saveData();
         }
 
         // 8. 觸發 100 分鐘里程碑動畫
-        function trigger
+        function triggerCelebration(milestone) {
+            const modalMessage = document.getElementById('modal-message');
+            const message = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
+            modalMessage.textContent = message;
+            document.getElementById('modal-overlay').style.display = 'flex';
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+        }
+        
+        // 9. 觸發 3600 分鐘總目標
+        function triggerFinalGoal() {
+            const modalMessage = document.getElementById('modal-message');
+            modalMessage.textContent = `恭喜你！完成了 ${GOAL_MINUTES} 分鐘的超級挑戰！你太強了！`;
+            document.getElementById('modal-overlay').style.display = 'flex';
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // --- 管理員登入功能 ---
+        
+        // 10. 點擊「管理員」按鈕
+        function handleAdminLoginClick() {
+            // 顯示登入 Modal
+            document.getElementById('admin-modal-overlay').style.display = 'flex';
+        }
+
+        // 11. 點擊「登入」按鈕
+        function handleAdminLoginSubmit() {
+            const passwordInput = document.getElementById('admin-password-input');
+            if (passwordInput.value === ADMIN_PASSCODE) {
+                loginAsAdmin();
+                document.getElementById('admin-modal-overlay').style.display = 'none';
+                passwordInput.value = ''; // 清空密碼
+            } else {
+                alert('密碼錯誤！');
+            }
+        }
+
+        // 12. 登入為管理員
+        function loginAsAdmin() {
+            isAdmin = true;
+            document.body.classList.add('admin-mode');
+            document.getElementById('admin-status').textContent = '(管理員模式)';
+            renderHistoryTable(); // 重新渲染表格以顯示隱藏項目
+        }
+
+        // --- 分享功能 ---
+        
+        // 13. 綁定「分享」按鈕
+        function handleShareClick() {
+            const activeHistory = history.filter(e => e.status === 'active');
+            const data = {
+                minutes: currentMinutes, 
+                history: activeHistory 
+            };
+            const encodedData = utf8_to_b64(JSON.stringify(data));
+            const shareUrl = window.location.origin + window.location.pathname + '#' + encodedData;
+
+            document.getElementById('share-url-input').value = shareUrl;
+            const qrcodeElement = document.getElementById('qrcode');
+            qrcodeElement.innerHTML = ""; 
+            try {
+                 new QRCode(qrcodeElement, {
+                    text: shareUrl, width: 200, height: 200,
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+            } catch (e) {
+                qrcodeElement.innerHTML = "QR Code 產生失敗。資料可能過多。";
+            }
+            document.getElementById('share-modal-overlay').style.display = 'flex';
+            
+            if (window.location.protocol === 'file:') {
+                alert("警告：您目前是透過 'file://' 協定開啟此頁面。\n\n產生的「分享連結」和「QR Code」將無法在其他裝置上使用。\n\n請將此 'index.html' 檔案上傳到一個網站伺服器 (例如 GitHub Pages) 才能正常使用分享功能。");
+            }
+        }
+
+        // 14. 綁定「複製連結」按鈕
+        function handleCopyLink() {
+            const shareUrlInput = document.getElementById('share-url-input');
+            const copyLinkButton = document.getElementById('copy-link-button');
+            shareUrlInput.select();
+            try {
+                document.execCommand('copy');
+                copyLinkButton.textContent = '已複製！';
+                setTimeout(() => { copyLinkButton.textContent = '複製連結'; }, 2000);
+            } catch (err) {
+                alert('複製失敗，請手動複製。');
+            }
+        }
+
+        // --- 資料儲存 (localStorage) ---
+
+        // 15. 儲存資料
+        function saveData() {
+            localStorage.setItem('timeTracker_history', JSON.stringify(history));
+        }
+
+        // 16. 讀取資料 (程式進入點)
+        function loadData() {
+            if (window.location.hash && window.location.hash.length > 1) {
+                console.log("偵測到 URL hash，嘗試讀取分享資料...");
+                const encodedData = window.location.hash.substring(1);
+                const jsonString = b64_to_utf8(encodedData);
+                
+                if (jsonString) {
+                    try {
+                        const data = JSON.parse(jsonString);
+                        history = data.history.map(entry => ({ ...entry, status: 'active' })) || [];
+                        saveData(); 
+                        history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                    } catch (e) {
+                        console.error("Failed to parse data from URL", e);
+                        loadFromLocalStorage(); 
+                    }
+                } else {
+                    loadFromLocalStorage();
+                }
+            } else {
+                loadFromLocalStorage();
+            }
+            
+            // 載入資料後，統一重新計算總數並渲染
+            recalculateTotalAndRender();
+        }
+        
+        // 17. 從 localStorage 讀取
+        function loadFromLocalStorage() {
+            console.log("從 localStorage 讀取資料...");
+            const savedHistory = localStorage.getItem('timeTracker_history');
+
+            if (savedHistory) {
+                history = JSON.parse(savedHistory);
+                // 向下相容，幫舊資料加上 ID 和 status
+                history = history.map(entry => {
+                    return {
+                        ...entry,
+                        id: entry.id || (Date.now() + Math.random()),
+                        status: entry.status || 'active'
+                    };
+                });
+            }
+        }
+    </script>
+</body>
+</html>
