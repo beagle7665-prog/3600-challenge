@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3600 分鐘挑戰</title>
+    <title>廣明地區 題目統計</title>
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         /* (部分樣式省略，只顯示新增/修改的部分) */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Mochiy+Pop+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        
         body {
             font-family: 'Noto Sans TC', sans-serif; background-color: #FFF9E6; color: #5D4037;
             display: flex; justify-content: center; align-items: center;
@@ -21,10 +22,16 @@
             border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             padding: 30px; text-align: center;
         }
+        
         h1 {
-            font-family: 'Mochiy Pop One', sans-serif; color: #FF7043;
-            margin-top: 0; font-size: 2em; line-height: 1.4;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 400; /* 取消粗體 */
+            color: #FF7043;
+            margin-top: 0;
+            font-size: 2.2em; /* 調整字體大小 */
+            line-height: 1.4;
         }
+        
         .progress-area { margin-bottom: 30px; }
         .progress-text {
             display: flex; justify-content: space-between;
@@ -62,7 +69,8 @@
         }
         .input-area input[type=number] { -moz-appearance: textfield; }
         .input-area button {
-            font-family: 'Mochiy Pop One', sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 700;
             font-size: 1.1em; padding: 12px 25px;
             background-color: #69F0AE; color: #004D40;
             border: none; border-radius: 10px; cursor: pointer;
@@ -76,7 +84,7 @@
             gap: 15px; color: #FFA726; flex-wrap: wrap;
         }
         
-        .admin-btn, .share-btn {
+        .admin-btn, .share-btn, .settings-btn {
             font-family: 'Noto Sans TC', sans-serif; font-weight: 700;
             font-size: 0.8em; padding: 8px 15px; border: none;
             border-radius: 8px; cursor: pointer;
@@ -86,11 +94,14 @@
         .share-btn:hover { background-color: #40C4FF; }
         .admin-btn { background-color: #B39DDB; color: #311B92; }
         .admin-btn:hover { background-color: #9575CD; }
+        .settings-btn { background-color: #4DB6AC; color: #004D40; }
+        .settings-btn:hover { background-color: #26A69A; }
         
         .admin-status {
             font-size: 0.8em; color: #D32F2F; font-weight: 700;
         }
-        body.admin-mode .admin-btn { display: none; }
+        body.admin-mode #admin-login-btn { display: none; }
+        body.admin-mode #admin-settings-btn { display: inline-block; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid #FFEDD5; }
@@ -129,7 +140,9 @@
             max-width: 90%; width: 450px;
         }
         .modal-content h3 {
-            font-family: 'Mochiy Pop One', sans-serif; font-size: 2em;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 700;
+            font-size: 2em;
             color: #FF5252; margin: 0 0 15px 0;
         }
         .modal-content p { font-size: 1.2em; margin-bottom: 25px; }
@@ -153,36 +166,51 @@
         #copy-link-button { background-color: #29B6F6; margin-right: 10px; }
         #share-modal-close-button { background-color: #BDBDBD; }
 
-        /* (新) 管理員登入 Modal 樣式 */
-        #admin-modal-content h3 {
-             color: #7E57C2; /* 深紫色 */
-        }
+        /* 管理員登入 Modal 樣式 */
+        #admin-modal-content h3 { color: #7E57C2; }
         .admin-form-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 1.1em;
+            display: flex; align-items: center;
+            margin-bottom: 20px; font-size: 1.1em;
         }
         .admin-form-group label {
-            width: 80px; /* 標籤固定寬度 */
+            width: 100px;
             text-align: right;
             margin-right: 15px;
             font-weight: 700;
         }
         .admin-form-group select, .admin-form-group input {
-            flex: 1; /* 佔滿剩餘空間 */
-            font-size: 1.1em;
-            padding: 10px;
-            border: 2px solid #D1C4E9; /* 淺紫色 */
+            flex: 1; 
+            font-size: 1.1em; padding: 10px;
+            border: 2px solid #D1C4E9; 
             border-radius: 10px;
             font-family: 'Noto Sans TC', sans-serif;
         }
-        #admin-login-submit-btn {
-            background-color: #7E57C2; /* 深紫色 */
-            margin-right: 10px;
+        .admin-form-group p {
+            font-size: 0.9em; color: #777;
+            margin: 5px 0 0 0; text-align: left;
+            width: 100%; padding-left: 115px;
         }
-        #admin-modal-close-btn {
-            background-color: #BDBDBD; /* 灰色 */
+        
+        #admin-login-submit-btn { background-color: #7E57C2; margin-right: 10px; }
+        #admin-modal-close-btn { background-color: #BDBDBD; }
+        
+        /* 管理員設定 Modal 樣式 */
+        #admin-settings-modal-content h3 { color: #4DB6AC; }
+        #admin-settings-modal-content .admin-form-group select, 
+        #admin-settings-modal-content .admin-form-group input {
+            border-color: #B2DFDB;
+        }
+        #save-settings-btn { background-color: #4DB6AC; margin-right: 10px; }
+        #admin-settings-close-btn { background-color: #BDBDBD; }
+        .danger-zone {
+            margin-top: 30px;
+            border-top: 2px dashed #FFAB91;
+            padding-top: 20px;
+        }
+        .danger-zone button {
+            background-color: #E53935;
+            color: white;
+            width: 100%;
         }
 
         @keyframes modal-pop {
@@ -194,7 +222,7 @@
 <body>
 
     <div class="container">
-        <h1>廣明地區四部同心<br>3600分鐘挑戰</h1>
+        <h1 id="main-title">廣明地區2026總會題目統計表</h1>
 
         <div class="progress-area">
             <div class="progress-text">
@@ -210,7 +238,8 @@
             <label for="person-select">人員：</label>
             <select id="person-select">
                 <option value="地區級幹部">地區級幹部</option>
-                <option value="地企管理員">地企管理員</option> <option value="三和組長">三和組長</option>
+                <option value="地企管理員">地企管理員</option>
+                <option value="三和組長">三和組長</option>
                 <option value="介壽組長">介壽組長</option>
                 <option value="柏林組長">柏林組長</option>
                 <option value="南豐組長">南豐組長</option>
@@ -227,6 +256,7 @@
             <h2>
                 累積紀錄
                 <span id="admin-status" class="admin-status"></span>
+                <button id="admin-settings-btn" class="settings-btn" style="display: none;">設定</button>
                 <button id="share-button" class="share-btn">分享進度</button>
                 <button id="admin-login-btn" class="admin-btn">管理員</button>
             </h2>
@@ -271,7 +301,8 @@
             <div class="admin-form-group">
                 <label for="admin-level-select">層級：</label>
                 <select id="admin-level-select">
-                    <option value="地企管理員">地企管理員</option> </select>
+                    <option value="地企管理員">地企管理員</option>
+                </select>
             </div>
             
             <div class="admin-form-group">
@@ -284,10 +315,35 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="admin-settings-modal-overlay">
+        <div class="modal-content" id="admin-settings-modal-content">
+            <h3>管理員設定</h3>
+            
+            <div class="admin-form-group">
+                <label for="setting-title-input">標題：</label>
+                <input type="text" id="setting-title-input">
+                <p>提示：使用 | 符號來換行, 例如：第一行|第二行</p>
+            </div>
+            
+            <div class="admin-form-group">
+                <label for="setting-goal-input">目標(分鐘)：</label>
+                <input type="number" id="setting-goal-input" min="1">
+            </div>
+            
+            <button id="save-settings-btn">儲存設定</button>
+            <button id="admin-settings-close-btn">取消</button>
+            
+            <div class="danger-zone">
+                <button id="clear-history-btn">清空所有紀錄</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- 變數定義 ---
-        const GOAL_MINUTES = 3600;
-        const ADMIN_PASSCODE = "1213"; // [!!] 已修改
+        const ADMIN_PASSCODE = "1213";
+        let goalMinutes = 3600;
+        let pageTitle = "廣明地區2026總會題目統計表"; // [!!] 已修改
         let currentMinutes = 0;
         let history = []; 
         let isAdmin = false; 
@@ -313,342 +369,4 @@
             
             // 恭喜 Modal 關閉按鈕
             document.getElementById('modal-close-button').addEventListener('click', () => {
-                document.getElementById('modal-overlay').style.display = 'none';
-            });
-            
-            // 分享按鈕
-            document.getElementById('share-button').addEventListener('click', handleShareClick);
-            
-            // 分享 Modal 內的按鈕
-            document.getElementById('copy-link-button').addEventListener('click', handleCopyLink);
-            document.getElementById('share-modal-close-button').addEventListener('click', () => {
-                document.getElementById('share-modal-overlay').style.display = 'none';
-            });
-            
-            // 管理員登入按鈕 (顯示 Modal)
-            document.getElementById('admin-login-btn').addEventListener('click', handleAdminLoginClick);
-            
-            // 管理員 Modal 內的按鈕
-            document.getElementById('admin-login-submit-btn').addEventListener('click', handleAdminLoginSubmit);
-            document.getElementById('admin-modal-close-btn').addEventListener('click', () => {
-                document.getElementById('admin-modal-overlay').style.display = 'none';
-                document.getElementById('admin-password-input').value = ''; // 關閉時清空密碼
-            });
-        }
-
-        // --- Base64 編碼/解碼輔助函式 (處理中文) ---
-        function utf8_to_b64(str) {
-            try { return btoa(unescape(encodeURIComponent(str))); }
-            catch (e) { console.error("Base64 encoding failed", e); return ""; }
-        }
-        function b64_to_utf8(str) {
-            try { return decodeURIComponent(escape(atob(str))); }
-            catch (e) { console.error("Base64 decoding failed", e); return ""; }
-        }
-
-        // --- 核心功能 (被 bindStaticEventListeners 呼叫) ---
-
-        // 2. 按下「累積！」按鈕的事件
-        function handleSubmit() {
-            const minutesInput = document.getElementById('minutes-input');
-            const personSelect = document.getElementById('person-select');
-            
-            const inputVal = parseInt(minutesInput.value, 10);
-            const personVal = personSelect.value; 
-
-            if (isNaN(inputVal) || inputVal <= 0) {
-                alert("請輸入有效的分鐘數！");
-                return;
-            }
-
-            const oldTotal = currentMinutes;
-            const oldMilestone = Math.floor(oldTotal / 100);
-            
-            const now = new Date();
-            const dateString = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
-            history.unshift({ 
-                id: Date.now(), 
-                date: dateString, 
-                person: personVal, 
-                minutes: inputVal,
-                status: 'active'
-            });
-
-            recalculateTotalAndRender(); 
-            
-            saveData();
-            minutesInput.value = ""; // 清空輸入框
-
-            const newMilestone = Math.floor(currentMinutes / 100);
-            if (newMilestone > oldMilestone) {
-                triggerCelebration(newMilestone);
-            }
-            if (currentMinutes === GOAL_MINUTES && oldTotal < GOAL_MINUTES) {
-                triggerFinalGoal();
-            }
-        }
-
-        // 3. 核心：重新計算總分鐘數並更新 UI
-        function recalculateTotalAndRender() {
-            currentMinutes = history
-                .filter(entry => entry.status === 'active')
-                .reduce((sum, entry) => sum + entry.minutes, 0);
-
-            if (currentMinutes > GOAL_MINUTES) {
-                currentMinutes = GOAL_MINUTES;
-            }
-            
-            updateProgressBarUI();
-            renderHistoryTable();
-        }
-
-        // 4. 僅更新進度條
-        function updateProgressBarUI() {
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const currentMinutesText = document.getElementById('current-minutes-text');
-            const percentageText = document.getElementById('percentage-text');
-
-            if (currentMinutes < 0) currentMinutes = 0;
-            let percentage = (currentMinutes / GOAL_MINUTES) * 100;
-            percentage = Math.max(0, Math.min(percentage, 100));
-            progressBarFill.style.width = percentage + '%';
-            currentMinutesText.textContent = `${currentMinutes} / ${GOAL_MINUTES} 分鐘`;
-            percentageText.textContent = `${percentage.toFixed(1)}%`;
-        }
-
-        // 5. 渲染歷史紀錄表格 (包含動態綁定「刪除/復原」按鈕)
-        function renderHistoryTable() {
-            const historyTableBody = document.getElementById('history-table-body');
-            historyTableBody.innerHTML = "";
-            
-            history.forEach(entry => {
-                if (entry.status === 'deleted' && !isAdmin) {
-                    return; 
-                }
-
-                const newRow = document.createElement('tr');
-                newRow.setAttribute('data-id', entry.id);
-                
-                let actionButtonHtml = '';
-
-                if (isAdmin) {
-                    if (entry.status === 'active') {
-                        actionButtonHtml = `<button class="delete-btn">刪除</button>`;
-                    } else {
-                        actionButtonHtml = `<button class="restore-btn">復原</button>`;
-                    }
-                } else {
-                    actionButtonHtml = `<button class="delete-btn">刪除</button>`;
-                }
-                
-                if (entry.status === 'deleted') {
-                    newRow.classList.add('deleted-row');
-                }
-
-                newRow.innerHTML = `
-                    <td>${entry.date}</td>
-                    <td>${entry.person || 'N/A'}</td>
-                    <td>${entry.minutes} 分鐘</td>
-                    <td>${actionButtonHtml}</td>
-                `;
-                
-                // 動態綁定
-                if (isAdmin) {
-                    if (entry.status === 'active') {
-                        newRow.querySelector('.delete-btn').addEventListener('click', () => {
-                            softDeleteHistoryEntry(entry.id);
-                        });
-                    } else {
-                        newRow.querySelector('.restore-btn').addEventListener('click', () => {
-                            restoreHistoryEntry(entry.id);
-                        });
-                    }
-                } else {
-                    newRow.querySelector('.delete-btn').addEventListener('click', () => {
-                        softDeleteHistoryEntry(entry.id);
-                    });
-                }
-
-                historyTableBody.append(newRow);
-            });
-        }
-        
-        // 6. 軟刪除一筆歷史紀錄
-        function softDeleteHistoryEntry(id) {
-            const entry = history.find(e => e.id === id);
-            if (!entry) return;
-
-            if (!confirm(`確定要刪除這筆 ${entry.minutes} 分鐘的紀錄嗎？\n(管理員可以復原)`)) {
-                return;
-            }
-
-            entry.status = 'deleted';
-            recalculateTotalAndRender();
-            saveData();
-        }
-
-        // 7. 復原一筆歷史紀錄
-        function restoreHistoryEntry(id) {
-            if (!isAdmin) return; 
-            const entry = history.find(e => e.id === id);
-            if (!entry) return;
-
-            if (!confirm(`確定要復原這筆 ${entry.minutes} 分鐘的紀錄嗎？`)) {
-                return;
-            }
-
-            entry.status = 'active';
-            recalculateTotalAndRender();
-            saveData();
-        }
-
-        // 8. 觸發 100 分鐘里程碑動畫
-        function triggerCelebration(milestone) {
-            const modalMessage = document.getElementById('modal-message');
-            const message = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
-            modalMessage.textContent = message;
-            document.getElementById('modal-overlay').style.display = 'flex';
-            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-        }
-        
-        // 9. 觸發 3600 分鐘總目標
-        function triggerFinalGoal() {
-            const modalMessage = document.getElementById('modal-message');
-            modalMessage.textContent = `恭喜你！完成了 ${GOAL_MINUTES} 分鐘的超級挑戰！你太強了！`;
-            document.getElementById('modal-overlay').style.display = 'flex';
-            const duration = 3 * 1000;
-            const end = Date.now() + duration;
-            (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        }
-
-        // --- 管理員登入功能 ---
-        
-        // 10. 點擊「管理員」按鈕
-        function handleAdminLoginClick() {
-            // 顯示登入 Modal
-            document.getElementById('admin-modal-overlay').style.display = 'flex';
-        }
-
-        // 11. 點擊「登入」按鈕
-        function handleAdminLoginSubmit() {
-            const passwordInput = document.getElementById('admin-password-input');
-            if (passwordInput.value === ADMIN_PASSCODE) {
-                loginAsAdmin();
-                document.getElementById('admin-modal-overlay').style.display = 'none';
-                passwordInput.value = ''; // 清空密碼
-            } else {
-                alert('密碼錯誤！');
-            }
-        }
-
-        // 12. 登入為管理員
-        function loginAsAdmin() {
-            isAdmin = true;
-            document.body.classList.add('admin-mode');
-            document.getElementById('admin-status').textContent = '(管理員模式)';
-            renderHistoryTable(); // 重新渲染表格以顯示隱藏項目
-        }
-
-        // --- 分享功能 ---
-        
-        // 13. 綁定「分享」按鈕
-        function handleShareClick() {
-            const activeHistory = history.filter(e => e.status === 'active');
-            const data = {
-                minutes: currentMinutes, 
-                history: activeHistory 
-            };
-            const encodedData = utf8_to_b64(JSON.stringify(data));
-            const shareUrl = window.location.origin + window.location.pathname + '#' + encodedData;
-
-            document.getElementById('share-url-input').value = shareUrl;
-            const qrcodeElement = document.getElementById('qrcode');
-            qrcodeElement.innerHTML = ""; 
-            try {
-                 new QRCode(qrcodeElement, {
-                    text: shareUrl, width: 200, height: 200,
-                    correctLevel : QRCode.CorrectLevel.M
-                });
-            } catch (e) {
-                qrcodeElement.innerHTML = "QR Code 產生失敗。資料可能過多。";
-            }
-            document.getElementById('share-modal-overlay').style.display = 'flex';
-            
-            if (window.location.protocol === 'file:') {
-                alert("警告：您目前是透過 'file://' 協定開啟此頁面。\n\n產生的「分享連結」和「QR Code」將無法在其他裝置上使用。\n\n請將此 'index.html' 檔案上傳到一個網站伺服器 (例如 GitHub Pages) 才能正常使用分享功能。");
-            }
-        }
-
-        // 14. 綁定「複製連結」按鈕
-        function handleCopyLink() {
-            const shareUrlInput = document.getElementById('share-url-input');
-            const copyLinkButton = document.getElementById('copy-link-button');
-            shareUrlInput.select();
-            try {
-                document.execCommand('copy');
-                copyLinkButton.textContent = '已複製！';
-                setTimeout(() => { copyLinkButton.textContent = '複製連結'; }, 2000);
-            } catch (err) {
-                alert('複製失敗，請手動複製。');
-            }
-        }
-
-        // --- 資料儲存 (localStorage) ---
-
-        // 15. 儲存資料
-        function saveData() {
-            localStorage.setItem('timeTracker_history', JSON.stringify(history));
-        }
-
-        // 16. 讀取資料 (程式進入點)
-        function loadData() {
-            if (window.location.hash && window.location.hash.length > 1) {
-                console.log("偵測到 URL hash，嘗試讀取分享資料...");
-                const encodedData = window.location.hash.substring(1);
-                const jsonString = b64_to_utf8(encodedData);
-                
-                if (jsonString) {
-                    try {
-                        const data = JSON.parse(jsonString);
-                        history = data.history.map(entry => ({ ...entry, status: 'active' })) || [];
-                        saveData(); 
-                        history.replaceState(null, document.title, window.location.pathname + window.location.search);
-                    } catch (e) {
-                        console.error("Failed to parse data from URL", e);
-                        loadFromLocalStorage(); 
-                    }
-                } else {
-                    loadFromLocalStorage();
-                }
-            } else {
-                loadFromLocalStorage();
-            }
-            
-            // 載入資料後，統一重新計算總數並渲染
-            recalculateTotalAndRender();
-        }
-        
-        // 17. 從 localStorage 讀取
-        function loadFromLocalStorage() {
-            console.log("從 localStorage 讀取資料...");
-            const savedHistory = localStorage.getItem('timeTracker_history');
-
-            if (savedHistory) {
-                history = JSON.parse(savedHistory);
-                // 向下相容，幫舊資料加上 ID 和 status
-                history = history.map(entry => {
-                    return {
-                        ...entry,
-                        id: entry.id || (Date.now() + Math.random()),
-                        status: entry.status || 'active'
-                    };
-                });
-            }
-        }
-    </script>
-</body>
-</html>
+                document.
